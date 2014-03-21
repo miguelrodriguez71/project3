@@ -54,8 +54,10 @@ var jsonData = {
 // Global Variables
 var defaultBrand = "SONY"
 var brand = "SONY";
-var defaultModel = "Type a TV Model"
+var defaultModel = "Type a TV Model";
 var model = "so01";
+var modelNumber;
+var codesToShow = [];
 
 
 // function to pick a Tv Brand
@@ -81,7 +83,7 @@ var pickABrand = function(defaultb) {
     
 };
 
-/* Function to get Models Number by Brand
+// Function to get Models Number by Brand
 
 var getModels = function() {
     var x = 0;
@@ -89,25 +91,98 @@ var getModels = function() {
     for (var i = 0; i < jsonData.tvCodes.length; i++) {
         var codes = jsonData.tvCodes[i];
         if (brand === codes.tvBrand) {
-            modelArray[x] = jsonData.tvModel[i];
+            modelArray.push(codes.tvModel);
             x++; 
         }
     
     };
+    
 
     return modelArray;
 };
-*/
 
-// Code starts with a loop to pick brand running to when a 0 is pressed
+// Function to pick a Model
+var getModelPick = function(nArray) {
+    var pickAModel = prompt("Type a Model Displayed (0 = I dont my model):  "+nArray);
+    if (pickAModel === "0") {
+        //I dont know my model
+        model = "Undefined";
+        return false;
+    } else {
+        // get my model pick
+        model = pickAModel;
+        
+        return true;
+    };
+    
+    return false;
+};
+
+// function to show Codes
+
+var getCodes = function(nBoolean,nModel) {
+    if (nBoolean === true) {
+        // only codes by model
+       for (var i = 0; i < jsonData.tvCodes.length; i++) {
+           var tCodes = jsonData.tvCodes[i];
+           if (nModel === tCodes.tvModel) {
+               codesToShow.push(tCodes.tvCode);
+            }
+       };
+    } else {
+        // All codes by brand
+       for (var i = 0; i < jsonData.tvCodes.length; i++) {
+           var tCodes = jsonData.tvCodes[i];
+           if (brand === tCodes.tvBrand) {
+               codesToShow.push(tCodes.tvCode);
+            }
+       };
+        
+    };
+    
+    return codesToShow.length; 
+
+};
+
+
+// Procedure to show codes
+var codesDisplay = function() {
+    var show = confirm("Try this Codes Please: "+codesToShow);
+};
+
+
+// Main Code
 
 while ( brand !== "0") {
+    codesToShow = [];
+    
     brand = pickABrand(defaultBrand);
-    console.log("Brand: " + brand)
+
     if (brand !== "0") {
         // Now we create an array with the TV models
-//        var modelOptions = getModels();
-//        console.log("Models: "+ modelOptions);        
+        var modelOptions = getModels();
+        for (var i = 0; i < modelOptions.length;i++) {
+            console.log("Modelo: "+modelOptions[i]);
+        };
+        var modelPick = getModelPick(modelOptions);
+        if (modelPick === true) {
+            //get only codes for a specific TV Model
+            var showModels = getCodes(true,model);
+        } else {
+            // get all codes by a TV Brand
+            var showModels = getCodes(false,model);
+        }
+        
+        // Showing the codes
+        var showProcess = codesDisplay();
+        
+        var exit = confirm("Do you want to start over?");
+        if (exit === false) {
+            //Exit
+            break;
+        }
+        
+        
     };
 };
 
